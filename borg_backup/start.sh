@@ -4,7 +4,10 @@ export BORG_PASSPHRASE="$(bashio::config 'passphrase')"
 export BORG_BASE_DIR="/data"
 export BORG_RSH="ssh -i ~/.ssh/id_ed25519 -o UserKnownHostsFile=/data/known_hosts"
 
+tmpdir=$(mktemp /backup/hassio-borg-XXXXXXXX)
 PUBLIC_KEY=`cat ~/.ssh/id_ed25519.pub`
+
+trap 'rm -rf "$tmpdir"' EXIT
 
 bashio::log.info "A public/private key pair was generated for you."
 bashio::log.notice "Please use this public key on the backup server:"
@@ -25,10 +28,31 @@ if [ "$(date +%u)" = 7 ]; then
     || bashio::exit.nok "Could not check archive integrity."
 fi
 
-bashio::log.info 'Uploading backup.'
-/usr/bin/borg create $(bashio::config 'create_options') \
-  "::$(bashio::config 'archive')-{utcnow}" /backup \
-  || bashio::exit.nok "Could not upload backup."
+if [ "$(bashio::config 'deduplicate_archives')" ]; then
+  for i in /backup/*.tar; do
+    archive_name=$(tar xf "$i" ./backup.json -O | jq -r '[.name, .date] | join("-")')
+
+    if [ -z "$archive_name" ]; then
+      bashio::log.error "Impossible to get backup info for $archive_name." \
+        "Ensure it's a vaild backup file or disable deduplicate_archives option"
+      continue
+    fi
+
+    # Handle this manually till we can't use borg import-tar
+    tardir="$tmpdir/$(basename "$i" .tar)"
+    mkdir "$tardir"
+    tar xvf "$i" -C "$tardir"
+    bashio::log.info "Uploading backup $i as $archive_name."
+    /usr/bin/borg create $(bashio::config 'create_options') \
+      "::$(bashio::config 'archive')-$archive_name" "$tardir" \
+      || bashio::exit.nok "Could not upload backup $i."
+  done
+else
+  bashio::log.info "Uploading backup."
+    /usr/bin/borg create $(bashio::config 'create_options') \
+      "::$(bashio::config 'archive')-{utcnow}" /backup \
+      || bashio::exit.nok "Could not upload backup."
+fi
 
 bashio::log.info 'Checking backups.'
 borg check --archives-only -P "$(bashio::config 'archive')"
