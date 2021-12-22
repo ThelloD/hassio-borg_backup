@@ -30,6 +30,9 @@ bashio::log.info 'Uploading backup.'
   "::$(bashio::config 'archive')-{utcnow}" /backup \
   || bashio::exit.nok "Could not upload backup."
 
+bashio::log.info 'Checking backups.'
+borg check --archives-only -P "$(bashio::config 'archive')"
+
 bashio::log.info 'Pruning old backups.'
 /usr/bin/borg prune $(bashio::config 'prune_options') --list \
   -P $(bashio::config 'archive') \
