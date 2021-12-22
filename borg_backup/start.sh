@@ -31,7 +31,8 @@ bashio::log.info 'Uploading backup.'
   || bashio::exit.nok "Could not upload backup."
 
 bashio::log.info 'Pruning old backups.'
-/usr/bin/borg prune --list -P $(bashio::config 'archive') $(bashio::config 'prune_options') \
+/usr/bin/borg prune $(bashio::config 'prune_options') --list \
+  -P $(bashio::config 'archive') \
   || bashio::exit.nok "Could not prune backups."
 
 local_snapshot_config=$(bashio::config 'local_snapshot')
