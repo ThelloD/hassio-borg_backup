@@ -110,9 +110,10 @@ local_snapshot=$((local_snapshot_config + 1))
 if [ $local_snapshot -gt 1 ]; then
   bashio::log.info 'Cleaning old snapshots.'
   cd /backup
-  ls -tp | grep -v '/$' | tail -n +$local_snapshot | tr '\n' '\0' | xargs -0 rm -- || true
   # Debugging
   ls -tp | grep -v '/$' | tail -n +$local_snapshot | cat -
+  # Delete
+  ls -tp | grep -v '/$' | tail -n +$local_snapshot | tr '\n' '\0' | xargs -0 rm -- || true
 fi
 
 bashio::log.info 'Finished.'
