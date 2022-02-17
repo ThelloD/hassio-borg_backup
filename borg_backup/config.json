@@ -1,9 +1,9 @@
 {
   "name": "BorgBackup",
-  "version": "0.56.4.4",
+  "version": "0.56.4.5",
   "slug": "borg_backup",
-  "description": "BorgBackup as a Hassio Add-On - Fork by frigi83",
-  "url": "https://github.com/frigi83/hassio-borg_backup",
+  "description": "BorgBackup as a Hassio Add-On (Fork)",
+  "url": "https://github.com/ThelloD/hassio-borg_backup",
   "startup": "once",
   "boot": "manual",
   "map": [
