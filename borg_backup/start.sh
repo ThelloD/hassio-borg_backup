@@ -54,7 +54,7 @@ if [ "$(bashio::config 'deduplicate_archives')" ]; then
     # Handle this manually till we can't use borg import-tar
     compressed=$(tar xf "$i" ./backup.json -O | jq -r '.compressed' || true)
     if [[ "$compressed" == 'false' ]]; then
-      bashio::log.info "Archive $i, it's already uncompressed"
+      bashio::log.info "Archive $i is already uncompressed"
       finaltar="$i"
       recreated=false
     else
