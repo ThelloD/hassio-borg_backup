@@ -40,7 +40,7 @@ if [ "$(bashio::config 'deduplicate_archives')" ]; then
     archive_name=$(tar xf "$i" ./backup.json -O | jq -r '[.name, .date] | join("-")' || true)
 
     if [ -z "$archive_name" ]; then
-      bashio::log.error "Impossible to get backup info for $archive_name." \
+      bashio::log.error "Impossible to get backup info for $i." \
         "Ensure it's a vaild backup file or disable deduplicate_archives option"
       continue
     fi
