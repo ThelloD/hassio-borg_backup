@@ -2,7 +2,7 @@
   "name": "BorgBackup",
   "version": "0.56.4.7",
   "slug": "borg_backup",
-  "description": "BorgBackup as a Hassio Add-On - Fork",
+  "description": "BorgBackup as a Hassio Add-On - Fork by ThelloD, based on 3v1n0, yeah and frigi83",
   "url": "https://github.com/ThelloD/hassio-borg_backup",
   "startup": "once",
   "boot": "manual",
@@ -21,7 +21,7 @@
     "passphrase": null,
     "create_options": "--stats --compression auto,zstd",
     "prune_options": "--keep-daily=8 --keep-weekly=5 --keep-monthly=13",
-    "deduplicate_archives": false,
+    "deduplicate_archives": true,
     "local_snapshot": 3
   },
   "schema": {
