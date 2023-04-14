@@ -30,6 +30,13 @@ if [ "$(date +%u)" = 7 ]; then
     || bashio::exit.nok "Could not check archive integrity."
 fi
 
+
+bashio::log.info 'Pruning old backups.'
+/usr/bin/borg prune $(bashio::config 'prune_options') --list \
+  -P $(bashio::config 'archive') \
+  || bashio::exit.nok "Could not prune backups."
+
+
 for i in /backup/*.tar; do
   backup_info="$i: $(tar xf "$i" ./backup.json -O 2> /dev/null | jq -r '[.name, .date] | join(" | ")' || true)"
   bashio::log.info "Backing up $backup_info"
@@ -110,11 +117,6 @@ fi
 
 bashio::log.info 'Checking backups.'
 borg check --archives-only -P "$(bashio::config 'archive')"
-
-bashio::log.info 'Pruning old backups.'
-/usr/bin/borg prune $(bashio::config 'prune_options') --list \
-  -P $(bashio::config 'archive') \
-  || bashio::exit.nok "Could not prune backups."
 
 local_snapshot_config=$(bashio::config 'local_snapshot')
 local_snapshot=$((local_snapshot_config + 1))
